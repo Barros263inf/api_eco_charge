@@ -2,14 +2,10 @@
 # coding: utf-8
 import os
 import oracledb
-from dotenv import load_dotenv
 from flask_cors import CORS
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-
-# Carrega as variaveis de ambiente
-load_dotenv()
 
 # Pega a API Key do ambiente
 API_KEY = os.environ.get("API_KEY")
@@ -33,10 +29,6 @@ def check():
     if any(agent in user_agent for agent in blocked_agents):
         return jsonify({"Error": "Acesso negado"}), 403
 
-    # Verifica a API Key
-    key = request.headers.get("X-API-KEY")
-    if key != API_KEY:
-        return jsonify({"error": "Acesso negado: API Key inválida"}), 403
     
 
 # Função para conectar ao banco de dados Oracle
