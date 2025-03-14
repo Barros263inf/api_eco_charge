@@ -1,0 +1,7 @@
+oracledb~=3.0.0
+flask~=3.1.0
+flask_cors
+gunicorn
+dotenv~=0.9.9
+python-dotenv~=1.0.1
+flask-cors~=5.0.1
