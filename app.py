@@ -7,28 +7,7 @@ from flask_cors import CORS
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-
-# Carrega as variaveis de ambiente
-load_dotenv()
-
-# Pega a API Key do ambiente
-API_KEY = os.environ.get("API_KEY")
-
-# Pega as origens permitidas do ambiente
-ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS")
-
-CORS(app, origins=ALLOWED_ORIGINS)
-
-# Verifica a origem da requisição
-@app.before_request
-def check():
-
-    # Lista de User-Agents indesejados
-    user_agent = request.headers.get("User-Agent", "").lower()
-    blocked_agents = ["insominia","postman","curl", "httpie", "python-requests"]
-    if any(agent in user_agent for agent in blocked_agents):
-        return jsonify({"Error": "Acesso negado"}), 403
-
+CORS(app)
 
 # Função para conectar ao banco de dados Oracle
 def get_db_connection():
