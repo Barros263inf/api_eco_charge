@@ -3,11 +3,36 @@
 import os
 import oracledb
 from dotenv import load_dotenv
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-CORS(app)
+
+# Carrega as variaveis de ambiente
+load_dotenv()
+
+# Pega a API Key do ambiente
+API_KEY = os.environ.get("API_KEY")
+
+# Pega as origens permitidas do ambiente
+ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS")
+
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+# Verifica a origem da requisição
+@app.before_request
+def check():
+
+    origin = request.headers.get("Origin") or request.headers.get("Referer")
+    if origin and not any (allowed in origin for allowed in ALLOWED_ORIGINS):
+        return jsonify({"Error":"Origem não permitida"}), 403
+
+    # Lista de User-Agents indesejados
+    user_agent = request.headers.get("User-Agent", "").lower()
+    blocked_agents = ["insominia","postman","curl", "httpie", "python-requests"]
+    if any(agent in user_agent for agent in blocked_agents):
+        return jsonify({"Error": "Acesso negado"}), 403
+
 
 # Função para conectar ao banco de dados Oracle
 def get_db_connection():
@@ -372,6 +397,7 @@ def delete_dispositivo(id):
 # Rota para retornar todos os estabelecimentos (GET)
 @app.route('/estabelecimentos', methods=['GET'])
 def get_estabelecimentos():
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
