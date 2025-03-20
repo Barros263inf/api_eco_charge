@@ -17,6 +17,8 @@ API_KEY = os.environ.get("API_KEY")
 # Pega as origens permitidas do ambiente
 ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS")
 
+# CORS(app, origins=ALLOWED_ORIGINS)
+
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Verifica a origem da requisição
@@ -29,9 +31,14 @@ def check():
 
     # Lista de User-Agents indesejados
     user_agent = request.headers.get("User-Agent", "").lower()
-    blocked_agents = ["insominia","postman","curl", "httpie", "python-requests"]
+    blocked_agents = ["insominia","curl", "httpie", "python-requests"]
     if any(agent in user_agent for agent in blocked_agents):
         return jsonify({"Error": "Acesso negado"}), 403
+
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 403
 
 
 # Função para conectar ao banco de dados Oracle
