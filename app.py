@@ -19,7 +19,7 @@ ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS")
 
 # CORS(app, origins=ALLOWED_ORIGINS)
 
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
 
 # Verifica a origem da requisição
 @app.before_request
@@ -31,14 +31,9 @@ def check():
 
     # Lista de User-Agents indesejados
     user_agent = request.headers.get("User-Agent", "").lower()
-    blocked_agents = ["insominia","curl", "httpie", "python-requests"]
+    blocked_agents = ["postman","insominia","curl", "httpie", "python-requests"]
     if any(agent in user_agent for agent in blocked_agents):
         return jsonify({"Error": "Acesso negado"}), 403
-
-    # Verifica a API Key
-    key = request.headers.get("X-API-KEY")
-    if key != API_KEY:
-        return jsonify({"error": "Acesso negado: API Key inválida"}), 403
 
 
 # Função para conectar ao banco de dados Oracle
@@ -54,11 +49,21 @@ def get_db_connection():
 ### SAUDAÇOES
 @app.route("/")
 def greetings():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     return jsonify({f"message": f"Voce esta acessando a API da EcoCharge!!!"}), 202
 
 ### AUTENICAÇÃO
 @app.route('/auth', methods=['POST'])
 def authenticate():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     # Recebe o JSON com email e senha
     credentials = request.json
     email = credentials.get("email")
@@ -91,6 +96,11 @@ def authenticate():
 # Rota para retornar todos os clientes (GET)
 @app.route('/clientes', methods=['GET'])
 def get_clientes():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -116,6 +126,11 @@ def get_clientes():
 # Rota para retornar um cliente pelo ID (GET)
 @app.route('/cliente/<int:id>', methods=['GET'])
 def get_cliente_by_id(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -141,6 +156,11 @@ def get_cliente_by_id(id):
 # Rota para retornar um cliente pelo email (GET)
 @app.route('/cliente/<string:email>', methods=['GET'])
 def get_cliente_by_email(email):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -167,6 +187,11 @@ def get_cliente_by_email(email):
 # Rota para adicionar um novo cliente (POST)
 @app.route('/cliente', methods=['POST'])
 def add_cliente():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     novo_cliente = request.json
     email = novo_cliente.get("email")
     nome = novo_cliente.get("nome")
@@ -196,6 +221,11 @@ def add_cliente():
 # Rota para atualizar um cliente existente pelo ID (PUT)
 @app.route('/cliente/<int:id>', methods=['PUT'])
 def update_cliente(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     cliente_atualizado = request.json
     email = cliente_atualizado.get("email")
     nome = cliente_atualizado.get("nome")
@@ -224,6 +254,11 @@ def update_cliente(id):
 # Rota para remover um cliente pelo ID (DELETE)
 @app.route('/cliente/<int:id>', methods=['DELETE'])
 def delete_cliente(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -243,6 +278,11 @@ def delete_cliente(id):
 # Rota para retornar todos os dispositivos (GET)
 @app.route('/dispositivos', methods=['GET'])
 def get_dispositivos():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -269,6 +309,11 @@ def get_dispositivos():
 # Rota para retornar um dispositivo pelo ID (GET)
 @app.route('/dispositivo/<int:id>', methods=['GET'])
 def get_dispositivo_by_id(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -295,6 +340,11 @@ def get_dispositivo_by_id(id):
 # Rota para retornar um dispositivo pelo Email (GET)
 @app.route('/dispositivo/<string:email>', methods=['GET'])
 def get_dispositivo_by_email(email):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -321,6 +371,11 @@ def get_dispositivo_by_email(email):
 # Rota para adicionar um novo dispositivo (POST)
 @app.route('/dispositivo', methods=['POST'])
 def add_dispositivo():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     novo_dispositivo = request.json
     imei = novo_dispositivo.get("imei")
     nome = novo_dispositivo.get("nome")
@@ -352,6 +407,11 @@ def add_dispositivo():
 # Rota para atualizar um dispositivo existente pelo ID (PUT)
 @app.route('/dispositivo/<int:id>', methods=['PUT'])
 def update_dispositivo(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     dispositivo_atualizado = request.json
     imei = dispositivo_atualizado.get("imei")
     nome = dispositivo_atualizado.get("nome")
@@ -385,6 +445,11 @@ def update_dispositivo(id):
 # Rota para remove um dispositivo pelo ID (DELETE)
 @app.route('/dispositivo/<int:id>', methods=['DELETE'])
 def delete_dispositivo(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -404,6 +469,15 @@ def delete_dispositivo(id):
 # Rota para retornar todos os estabelecimentos (GET)
 @app.route('/estabelecimentos', methods=['GET'])
 def get_estabelecimentos():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
 
     connection = get_db_connection()
     cursor = connection.cursor()
@@ -437,6 +511,11 @@ def get_estabelecimentos():
 # Rota para retornar um único estabelecimento pelo ID (GET)
 @app.route('/estabelecimento/<int:id>', methods=['GET'])
 def get_estabelecimento_by_id(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -470,6 +549,11 @@ def get_estabelecimento_by_id(id):
 # Rota para adicionar um novo estabelecimento (POST)
 @app.route('/estabelecimento', methods=['POST'])
 def add_estabelecimento():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     novo_estabelecimento = request.json
     cnpj = novo_estabelecimento.get("cnpj")
     nome = novo_estabelecimento.get("nome")
@@ -540,6 +624,11 @@ def add_estabelecimento():
 # Rota para atualizar um estabelecimento existente (PUT)
 @app.route('/estabelecimento/<int:id>', methods=['PUT'])
 def update_estabelecimento(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     estab_atualizado = request.json
 
     connection = get_db_connection()
@@ -566,6 +655,11 @@ def update_estabelecimento(id):
 # Rota para deletar um estabelecimento (DELETE)
 @app.route('/estabelecimento/<int:id>', methods=['DELETE'])
 def delete_estabelecimento(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -584,6 +678,11 @@ def delete_estabelecimento(id):
 # Rota para retornar todas as sessões (GET)
 @app.route('/sessoes', methods=['GET'])
 def get_sessoes():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -608,6 +707,11 @@ def get_sessoes():
 # Rota para retornar uma sessão pelo ID (GET)
 @app.route('/sessao/<int:id>', methods=['GET'])
 def get_sessao_by_id(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -632,6 +736,11 @@ def get_sessao_by_id(id):
 # Rota para adicionar uma nova sessão (POST)
 @app.route('/sessao', methods=['POST'])
 def add_sessao():
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     nova_sessao = request.json
     dispositivo = nova_sessao.get("dispositivo")
     cliente = nova_sessao.get("cliente")
@@ -661,6 +770,11 @@ def add_sessao():
 # Rota para atualizar uma sessão existente pelo ID (PUT)
 @app.route('/sessao/<int:id>', methods=['PUT'])
 def update_sessao(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     sessao_atualizada = request.json
     dispositivo = sessao_atualizada.get("dispositivo")
     cliente = sessao_atualizada.get("cliente")
@@ -696,6 +810,11 @@ def update_sessao(id):
 # Rota para remover uma sessão pelo ID (DELETE)
 @app.route('/sessao/<int:id>', methods=['DELETE'])
 def delete_sessao(id):
+    # Verifica a API Key
+    key = request.headers.get("X-API-KEY")
+    if key != API_KEY:
+        return jsonify({"error": "Acesso negado: API Key inválida"}), 401
+
     connection = get_db_connection()
     cursor = connection.cursor()
 
