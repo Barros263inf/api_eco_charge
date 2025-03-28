@@ -19,7 +19,7 @@ ALLOWED_ORIGINS = os.environ.get("ALLOWED_ORIGINS")
 
 # CORS(app, origins=ALLOWED_ORIGINS)
 
-CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Verifica a origem da requisição
 @app.before_request
@@ -766,6 +766,7 @@ def add_sessao():
         cursor.close()
         connection.close()
         return jsonify({"message": f"Erro ao adicionar sessão: {str(e)}"}), 500
+
 
 # Rota para atualizar uma sessão existente pelo ID (PUT)
 @app.route('/sessao/<int:id>', methods=['PUT'])
