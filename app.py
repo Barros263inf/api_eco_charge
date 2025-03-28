@@ -25,10 +25,6 @@ CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 @app.before_request
 def check():
 
-    origin = request.headers.get("Origin") or request.headers.get("Referer")
-    if origin and not any (allowed in origin for allowed in ALLOWED_ORIGINS):
-        return jsonify({"Error":"Origem não permitida"}), 403
-
     # Lista de User-Agents indesejados
     user_agent = request.headers.get("User-Agent", "").lower()
     blocked_agents = ["postman","insominia","curl", "httpie", "python-requests"]
